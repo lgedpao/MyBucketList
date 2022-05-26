@@ -2,7 +2,7 @@
 
 namespace MyBucketList.Core.Interfaces.Data.Repositories
 {
-    public interface IBucketListItemRepository : IRepository<BucketListItem>
+    public interface IBucketlistItemRepository : IRepository<BucketlistItem>
     {
     }
 }

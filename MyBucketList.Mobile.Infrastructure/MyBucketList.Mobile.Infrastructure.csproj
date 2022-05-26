@@ -10,4 +10,13 @@
     <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MyBucketList.Core\MyBucketList.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Models\" />
+    <Folder Include="Data\Repositories\Interfaces\" />
+  </ItemGroup>
+
 </Project>

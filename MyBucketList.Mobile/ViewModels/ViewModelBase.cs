@@ -4,10 +4,11 @@ using Prism.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MyBucketList.Mobile.ViewModels
 {
-    public class ViewModelBase : BindableBase, IInitialize, INavigationAware, IDestructible
+    public class ViewModelBase : BindableBase, IInitialize, IInitializeAsync, INavigationAware, IDestructible
     {
         protected INavigationService NavigationService { get; private set; }
 
@@ -41,6 +42,11 @@ namespace MyBucketList.Mobile.ViewModels
         public virtual void Destroy()
         {
 
+        }
+
+        public Task InitializeAsync(INavigationParameters parameters)
+        {
+            return Task.CompletedTask;
         }
     }
 }

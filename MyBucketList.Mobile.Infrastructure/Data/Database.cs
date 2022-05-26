@@ -1,4 +1,4 @@
-﻿using MyBucketList.Mobile.Infrastructure.Data.Models;
+﻿using MyBucketList.Core.Domain.Entities;
 using MyBucketList.Mobile.Infrastructure.Data.Repositories;
 using System;
 using System.Threading.Tasks;
@@ -15,33 +15,36 @@ namespace MyBucketList.Mobile.Infrastructure.Data
 
         #region Ctor
 
-        public Database(DatabaseConnection databaseConnection) : base(databaseConnection) { }
+        public Database(DatabaseConnection databaseConnection) : base(databaseConnection) 
+        {
+
+        }
 
         #endregion
 
         #region Methods
 
-        public async Task InitializeDatabase()
+        public void InitializeDatabase()
         {
-            await CreateTables();
+            CreateTables();
 
-            int currentDbVersion = await GetDatabaseVersion();
+            int currentDbVersion = GetDatabaseVersion();
 
             if (currentDbVersion < _databaseVersion)
-                await UpgradeDatabase();
+                UpgradeDatabase();
         }
 
-        private async Task<int> GetDatabaseVersion()
+        private int GetDatabaseVersion()
         {
-            return await AttemptAndRetry(() => _databaseConnection.AsyncDb.ExecuteScalarAsync<int>("PRAGMA user_version")).ConfigureAwait(false);
+            return _databaseConnection.SyncDb.ExecuteScalar<int>("PRAGMA user_version");
         }
 
-        private async Task UpgradeDatabase()
+        private void UpgradeDatabase()
         {
             //the first time ever we get this value after the database creation
             //this should be equals 0. but it's ok and will perform the correct
             //updates in the switch.
-            int currentDbVersion = await GetDatabaseVersion();
+            int currentDbVersion = GetDatabaseVersion();
 
             if (currentDbVersion < _databaseVersion)
             {
@@ -68,7 +71,7 @@ namespace MyBucketList.Mobile.Infrastructure.Data
                         throw new Exception("something went really wrong");
                 }
 
-                await SetDatabaseToVersion(_databaseVersion);
+                SetDatabaseToVersion(_databaseVersion);
             }
         }
 
@@ -81,26 +84,23 @@ namespace MyBucketList.Mobile.Infrastructure.Data
 
         private static void UpgradeFrom2To3() { }
 
-        private async Task<int> SetDatabaseToVersion(int version)
+        private int SetDatabaseToVersion(int version)
         {
-            return await AttemptAndRetry(() => _databaseConnection.AsyncDb.ExecuteAsync("PRAGMA user_version = " + version)).ConfigureAwait(false);
+            return _databaseConnection.SyncDb.Execute("PRAGMA user_version = " + version);
         }
 
-        private async Task CreateTables()
+        private void CreateTables()
         {
-            await AttemptAndRetry(async () =>
-            {
-                await _databaseConnection.AsyncDb.CreateTableAsync<BucketListItemData>();
+            _databaseConnection.SyncDb.CreateTable<BucketlistItem>();
 
-                await _databaseConnection.AsyncDb.ExecuteAsync("PRAGMA foreign_keys = ON");
-            }).ConfigureAwait(false);
+            _databaseConnection.SyncDb.Execute("PRAGMA foreign_keys = ON");
         }
 
         public async Task DeleteTables()
         {
             await AttemptAndRetry(async () =>
             {
-                await _databaseConnection.AsyncDb.DropTableAsync<BucketListItemData>();
+                await _databaseConnection.AsyncDb.DropTableAsync<BucketlistItem>();
             }).ConfigureAwait(false);
         }
 

@@ -1,8 +1,13 @@
-﻿namespace MyBucketList.Core.Domain.Entities
+﻿using SQLite;
+
+namespace MyBucketList.Core.Domain.Entities
 {
-    public class BucketListItem
+    [Table("bucketListItem")]
+    public class BucketlistItem
     {
-        public string Id { get; set; }
+        [PrimaryKey]
+        [AutoIncrement]
+        public int Id { get; set; }
 
         public string Title { get; set; }
     }
